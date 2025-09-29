@@ -1,16 +1,18 @@
 """Alembic environment configuration."""
 
 import asyncio
-import os
 from logging.config import fileConfig
-from sqlalchemy import pool
-from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config, create_async_engine
-from alembic import context
+from pathlib import Path
 
 # Import your models
 import sys
-from pathlib import Path
+
+from sqlalchemy import pool
+from sqlalchemy.engine import Connection
+from sqlalchemy.ext.asyncio import create_async_engine
+
+from alembic import context
+
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 from infrastructure.database.models import Base
@@ -72,7 +74,7 @@ async def run_async_migrations() -> None:
     url = config.get_main_option("sqlalchemy.url")
     if url and not url.startswith("postgresql+asyncpg://"):
         url = url.replace("postgresql://", "postgresql+asyncpg://")
-    
+
     connectable = create_async_engine(
         url,
         poolclass=pool.NullPool,
