@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: vega_ai
+      POSTGRES_USER: vega_user
+      POSTGRES_PASSWORD: vega_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U vega_user -d vega_ai" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://vega_user:vega_password@postgres:5432/vega_ai
+      - REDIS_URL=redis://redis:6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=gpt-4
+      - EMBEDDING_MODEL=text-embedding-ada-002
+      - KNOWLEDGE_BASE_PATH=/app/knowledge_base
+      - SECRET_KEY=vega-secret-key-change-in-production
+      - DEBUG=true
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./knowledge_base:/app/knowledge_base
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Starting application...' &&
+        poetry run python -m uvicorn src.main:app --host 0.0.0.0 --port 8000
+      "
+
+volumes:
+  postgres_data:
+  redis_data:
