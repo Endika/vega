@@ -131,7 +131,6 @@ class ProcessWebSocketMessageUseCase:
                 confidence_score=0.0,
             )
 
-
         # Prepare response
         extracted_info = {
             "order_number": str(extracted_data.order_number)
