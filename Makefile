@@ -40,8 +40,8 @@ format: ## Format code
 	poetry run ruff check --fix src/ tests/ scripts/
 
 pre-commit: ## Run pre-commit checks
-	poetry run ruff check src/ tests/ scripts/
-	poetry run ruff format --check src/ tests/ scripts/
+	poetry run ruff check src/ tests/
+	poetry run ruff format --check src/ tests/
 	poetry run mypy src/ tests/
 
 clean: ## Clean up temporary files

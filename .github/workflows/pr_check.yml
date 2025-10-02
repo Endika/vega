@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 jobs:
-  pre-commit:
+  linter-and-formatter:
     runs-on: ubuntu-latest
 
     steps:
@@ -50,3 +50,6 @@ jobs:
 
     - name: Run pre-commit checks
       run: make pre-commit
+
+    - name: Run tests
+      run: make test
